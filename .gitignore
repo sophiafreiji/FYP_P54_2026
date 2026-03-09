@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+.env
+fyp-54-firebase.json
+*.pem
+node_modules
+dist
