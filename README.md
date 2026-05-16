@@ -864,8 +864,6 @@ The VM hosts:
 - Revocation API
 - CRL Distribution
 
-# Update CRL and OCSP URLs on the Windows Server CA
-
 link to download:
 
 ```link
@@ -876,9 +874,9 @@ When the VM IP address changes, you must update the Certificate Authority distri
 
 ---
 
-# Open Certification Authority
+# Certification Authority IP changes
 
-1. Open:
+1. Open in the VM:
 
 ```text
 Server Manager
@@ -890,8 +888,8 @@ Server Manager
 Tools -> Certification Authority
 ```
 
-3. In the left panel, locate your CA server
-4. Right-click your CA name
+3. In the left panel, locate the CA server
+4. Right-click the CA name
 5. Select:
 
 ```text
