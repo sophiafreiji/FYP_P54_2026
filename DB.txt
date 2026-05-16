@@ -1,0 +1,135 @@
+Run this entire script on a fresh PostgreSQL database. All tables, indexes, constraints, and migrations are included in order.
+
+- USERS
+
+CREATE TABLE IF NOT EXISTS users (
+    id                     SERIAL PRIMARY KEY,
+    firebase_uid           TEXT      NOT NULL UNIQUE,
+    email                  TEXT      UNIQUE NOT NULL,
+    username               TEXT,
+    display_name           TEXT,
+    provider               TEXT,
+    is_blacklisted         BOOLEAN   NOT NULL DEFAULT FALSE,
+    blacklisted_at         TIMESTAMP,
+    last_active_platform   TEXT,
+    last_active_at         TIMESTAMP,
+    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+- BACKUP CODES
+
+CREATE TABLE IF NOT EXISTS backup_codes (
+    id         SERIAL PRIMARY KEY,
+    user_id    INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code_hash  TEXT      NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_backup_codes_user ON backup_codes(user_id);
+
+- SESSIONS
+
+CREATE TABLE IF NOT EXISTS sessions (
+    id          SERIAL PRIMARY KEY,
+    user_id     INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  TEXT      NOT NULL UNIQUE,
+    platform    TEXT      NOT NULL,
+    ip_address  TEXT,
+    last_active TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_user     ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_token    ON sessions(token_hash);
+CREATE INDEX IF NOT EXISTS idx_sessions_platform ON sessions(user_id, platform);
+
+- REQUESTS
+
+CREATE TABLE IF NOT EXISTS requests (
+    id                     SERIAL PRIMARY KEY,
+    user_id                INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content                TEXT      NOT NULL,
+    summary                TEXT,
+    status                 TEXT      NOT NULL DEFAULT 'pending',
+    signature_format       TEXT      NOT NULL DEFAULT 'pkcs7',
+    requires_second_signer BOOLEAN   NOT NULL DEFAULT FALSE,
+    second_signer_id       INTEGER   REFERENCES users(id),
+    first_signed_at        TIMESTAMP,
+    second_signed_at       TIMESTAMP,
+    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT requests_status_check CHECK (
+        status IN (
+            'pending',
+            'accepted',
+            'rejected',
+            'pending_first_signer',
+            'pending_second_signer'
+        )
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_requests_user   ON requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_requests_status ON requests(status);
+
+- CERTIFICATES
+
+CREATE TABLE IF NOT EXISTS certificates (
+    id            SERIAL PRIMARY KEY,
+    user_id       INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    certificate   TEXT      NOT NULL,
+    serial_number TEXT      NOT NULL UNIQUE,
+    status        TEXT      NOT NULL DEFAULT 'active',
+    source        TEXT      NOT NULL DEFAULT 'adcs',
+    issued_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at    TIMESTAMP,
+    revoked_at    TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_certificates_user   ON certificates(user_id);
+CREATE INDEX IF NOT EXISTS idx_certificates_serial ON certificates(serial_number);
+CREATE INDEX IF NOT EXISTS idx_certificates_status ON certificates(user_id, status);
+
+- SIGNATURES
+
+CREATE TABLE IF NOT EXISTS signatures (
+    id               SERIAL PRIMARY KEY,
+    request_id       INTEGER   NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
+    user_id          INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    certificate_id   INTEGER   REFERENCES certificates(id),
+    pkcs7            TEXT      NOT NULL,
+    content_hash     TEXT      NOT NULL,
+    verified         BOOLEAN   NOT NULL DEFAULT FALSE,
+    signed_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    signature_format TEXT      NOT NULL DEFAULT 'pkcs7',
+    is_partial       BOOLEAN   NOT NULL DEFAULT FALSE,
+    signer_order     INTEGER   NOT NULL DEFAULT 1,
+    signer_info_der  TEXT,
+    signer_cert_der  TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_signatures_request ON signatures(request_id);
+CREATE INDEX IF NOT EXISTS idx_signatures_user    ON signatures(user_id);
+
+- LOGS
+
+CREATE TABLE IF NOT EXISTS logs (
+    id         SERIAL PRIMARY KEY,
+    user_id    INTEGER   REFERENCES users(id) ON DELETE SET NULL,
+    action     TEXT      NOT NULL,
+    platform   TEXT,
+    ip_address TEXT,
+    detail     TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_logs_user    ON logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_logs_action  ON logs(action);
+CREATE INDEX IF NOT EXISTS idx_logs_created ON logs(created_at);
+
+- DEVICE TOKENS
+
+CREATE TABLE IF NOT EXISTS device_tokens (
+    id         SERIAL PRIMARY KEY,
+    user_id    INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    fcm_token  TEXT      NOT NULL,
+    platform   TEXT      NOT NULL DEFAULT 'android',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, fcm_token)
+);
+CREATE INDEX IF NOT EXISTS idx_device_tokens_user ON device_tokens(user_id);
