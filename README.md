@@ -1079,7 +1079,10 @@ Run local HTTPS server:
 ```bash
 npx http-server -p 5500 --ssl --cert localhost.pem --key localhost-key.pem
 ```
-```on an internet search engine (Chrome, Safari, ...)
+
+on an internet search engine (Chrome, Safari, ...):
+
+```
 https://localhost:5500
 ```
 
