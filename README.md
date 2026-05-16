@@ -316,7 +316,7 @@ For iOS device installation:
 3. Connect cable to phone
 5. Enable Developer Options
 
-(NB for the next sections, FYP54-CA.pem is avsilable to download in the Web.zip in the backend folder. It comes from the project CA generated in the downloadable VM.)
+(NB for the next sections, `FYP54-CA.pem` is available to download in the Web.zip in the backend folder. It comes from the project CA generated in the downloadable VM.)
 
 Install the certificate on Android and iOS:
 
@@ -327,7 +327,7 @@ Install the certificate on Android and iOS:
 5. Trust them
 
 Install the certificate in your laptop/machine certificate store:
-1. Install and trust "FYP54-CA.pem"
+1. Install and trust `FYP54-CA.pem`
 
 ---
 
