@@ -167,7 +167,7 @@ The Secure Signing Portal is composed of several interconnected components:
 
 # Installation Guide
 
-## 1. Create and Activate Python Virtual Environment
+## 1. Create and Activate Python Virtual Environment in the backend folder
 
 Install virtualenv:
 
@@ -1022,18 +1022,11 @@ These commands restart the Certificate Authority service and regenerate the upda
 
 # Database Setup
 
-Run the PostgreSQL schema on a fresh database.
+1. Install PostgreSQL.
 
-The database includes:
+2. Run the DB query on a fresh database in PostgreSQL.
 
-- Users
-- Sessions
-- Backup Codes
-- Requests
-- Certificates
-- Signatures
-- Logs
-- Device Tokens
+3. DB credentials will be used in the .env file.
 
 ---
 
@@ -1085,6 +1078,9 @@ Run local HTTPS server:
 
 ```bash
 npx http-server -p 5500 --ssl --cert localhost.pem --key localhost-key.pem
+```
+```on an internet search engine (Chrome, Safari, ...)
+https://localhost:5500
 ```
 
 ---
