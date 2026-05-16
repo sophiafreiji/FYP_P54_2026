@@ -284,7 +284,7 @@ Replace the certificate files in both backend and frontend folders.
 
 ---
 
-# Android Root Certificate Installation
+# Certificate Installation
 
 Navigate to:
 
@@ -316,6 +316,8 @@ For iOS device installation:
 3. Connect cable to phone
 5. Enable Developer Options
 
+(NB for the next sections, FYP54-CA.pem is avsilable to download in the Web.zip in the backend folder. It comes from the project CA generated in the downloadable VM.)
+
 Install the certificate on Android and iOS:
 
 1. Settings
@@ -323,6 +325,9 @@ Install the certificate on Android and iOS:
 3. Import the two on your phone
 4. Install `rootca.crt` and `FYP54-CA.pem`
 5. Trust them
+
+Install the certificate in your laptop/machine certificate store:
+1. Install and trust "FYP54-CA.pem"
 
 ---
 
