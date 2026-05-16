@@ -270,7 +270,7 @@ mkcert -install
 Generate local HTTPS certificates:
 
 ```bash
-mkcert localhost <ip-address>
+mkcert localhost 127.0.0.1 <ip-address>
 ```
 
 This generates in C:\Users\User (change the names so they macth this):
@@ -292,7 +292,7 @@ Navigate to:
 C:\Users\User\AppData\Local\mkcert
 ```
 
-Locate the generated root CA certificate and:
+Locate the generated root CA certificate for mkcert and:
 
 - Rename it to `rootca.pem`
 - Copy it into:
@@ -320,10 +320,9 @@ Install the certificate on Android and iOS:
 
 1. Settings
 2. Security and Privacy
-3. Credential Storage
-4. Install from Device Storage
-5. CA Certificate
-6. Install `rootca.crt` and `FYP54-CA.pem`
+3. Import the two on your phone
+4. Install `rootca.crt` and `FYP54-CA.pem`
+5. Trust them
 
 ---
 
@@ -732,7 +731,8 @@ let baseURL = "https://192.168.1.104:8000"
 ```
 
 > The backend machine and the iPhone must be connected to the same local network.
-> Now drag and drop all the downloaded files in XCode project folder
+> Now drag and drop all the downloaded files in XCode project folder.
+> On the first run and app launch, make sure to accept the application pop up, allowing local network access for the app.
 ---
 
 # Web Frontend Firebase Setup
